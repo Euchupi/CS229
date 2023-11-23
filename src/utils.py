@@ -17,6 +17,7 @@ class company():
     # We need the ticker name of the company to get started 
     def __init__(self,ticker,autofill=True):
         self.ticker = ticker  
+        self.constrain_time_range()
         self.generate_time_series()
 
     def __repr__(self):
@@ -29,11 +30,33 @@ class company():
         self.start = pd.to_datetime(start,format='%Y-%m-%d')
         self.end = pd.to_datetime(end,format='%Y-%m-%d')
         self.frequency = pd.Timedelta(days=frequency)
+        self.constrain_time_range()
         self.generate_time_series()
+
+        
+    def constrain_time_range(self):
+        # The temp is to save the readout data 
+        temp = pd.read_csv('../data/price/{}_price.csv'.format(self.ticker))
+        
+        # Filter the data within the interesting time  area. 
+        referdate = pd.to_datetime( temp['Date'], format='%Y-%m-%d') 
+        
+        price_start = np.min(np.array(referdate)) 
+        price_end = np.max(np.array(referdate)) 
+        
+        if self.start < price_start : 
+            self.start = price_start 
+        
+        if self.end > price_end : 
+            self.end = price_end 
+
         
     def generate_time_series(self): 
         data_points_number = int((self.end - self.start)/(self.frequency)) +1 
         self.time_series = np.array([ x*self.frequency + self.start for x in range(data_points_number) ])
+    
+    
+    
     
     # To verify the integrity of the data .... 
     def feature_list(self): 
