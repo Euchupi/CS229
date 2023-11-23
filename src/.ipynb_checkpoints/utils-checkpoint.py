@@ -8,6 +8,15 @@ import pandas as pd
 import numpy as np 
 import scipy as sp 
 
+
+def get_company_list(n=500):
+    temp = pd.read_csv('../SP500.csv')
+    return np.array(temp['Symbol'])[:n]
+        
+
+
+
+
 class company():
     # Timeformat, pd datetime, convenient to use with the datetime array. 
     start = pd.to_datetime('1970-01-01',format='%Y-%m-%d')
@@ -49,7 +58,8 @@ class company():
         
         if self.end > price_end : 
             self.end = price_end 
-
+        
+        return 
         
     def generate_time_series(self): 
         data_points_number = int((self.end - self.start)/(self.frequency)) +1 
