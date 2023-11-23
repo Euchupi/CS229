@@ -112,8 +112,13 @@ class company():
         
         # Filter the data within the interesting time  area. 
         referdate = pd.to_datetime( temp['Date'], format='%Y-%m-%d') 
-        temp_date = referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )]
+        temp_date = np.array(referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
         temp_data = np.array(temp[target[1]][ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
+        
+        # reorganzie the data sequence 
+        date_arg = np.array(np.argsort(temp_date))
+        temp_date = temp_date[date_arg]
+        temp_data = temp_data[date_arg]
         
         # Not Every data works, and then we will rebuild the data according to the the time series 
         # For the timebeing, we will use the uniform choice method 
@@ -138,8 +143,13 @@ class company():
         
         # Filter the data within the 
         referdate = pd.to_datetime( np.array(temp.columns[1:]) ,format='%m/%d/%Y' )
-        temp_date= referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )]
+        temp_date= np.array(referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
         temp_data= np.array(temp.iloc[i][1:][ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
+        
+        # reorganzie the data sequence 
+        date_arg = np.argsort(temp_date)
+        temp_date = temp_date[date_arg]
+        temp_data = temp_data[date_arg]
         
         # Not Every data works, and then we will rebuild the data according to the the time series 
         # For the timebeing, we will use the uniform choice method 
@@ -163,8 +173,13 @@ class company():
         
         # Filter the data within the 
         referdate = pd.to_datetime( np.array(temp.columns[2:]) ,format='%m/%d/%Y' )
-        temp_date= referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )]
+        temp_date= np.array(referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
         temp_data= np.array(temp.iloc[i][2:][ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
+
+        # reorganzie the data sequence 
+        date_arg = np.argsort(temp_date)
+        temp_date = temp_date[date_arg]
+        temp_data = temp_data[date_arg]        
         
         # Not Every data works, and then we will rebuild the data according to the the time series 
         # For the timebeing, we will use the uniform choice method 
@@ -189,8 +204,13 @@ class company():
         
         # Filter the data within the 
         referdate = pd.to_datetime( np.array(temp.columns[2:]) ,format='%m/%d/%Y' )
-        temp_date= referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )]
+        temp_date= np.array(referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
         temp_data= np.array(temp.iloc[i][2:][ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
+
+        # reorganzie the data sequence 
+        date_arg = np.argsort(temp_date)
+        temp_date = temp_date[date_arg]
+        temp_data = temp_data[date_arg]        
         
         # Not Every data works, and then we will rebuild the data according to the the time series 
         # For the timebeing, we will use the uniform choice method 
@@ -214,8 +234,13 @@ class company():
         
         # Filter the data within the time range 
         referdate = pd.to_datetime( np.array(temp.columns[2:]) ,format='%m/%d/%Y' )
-        temp_date= referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )]
+        temp_date= np.array(referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
         temp_data= np.array(temp.iloc[i][2:][ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
+
+        # reorganzie the data sequence 
+        date_arg = np.argsort(temp_date)
+        temp_date = temp_date[date_arg]
+        temp_data = temp_data[date_arg]        
         
         # Not Every data works, and then we will rebuild the data according to the the time series 
         # For the timebeing, we will use the uniform choice method 
@@ -232,8 +257,13 @@ class company():
         
         # Filter data 
         referdate = pd.to_datetime( np.array(temp.iloc[target_row]['scoredate']) ,format='%Y-%m-%d' )
-        temp_date= referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )]
+        temp_date= np.array(referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
         temp_data= np.array(temp.iloc[target_row]['scorevalue'][ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
+
+        # reorganzie the data sequence 
+        date_arg = np.argsort(temp_date)
+        temp_date = temp_date[date_arg]
+        temp_data = temp_data[date_arg]        
         
         # Not Every data works, and then we will rebuild the data according to the the time series 
         # For the timebeing, we will use the uniform choice method 
