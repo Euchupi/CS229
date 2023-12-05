@@ -13,7 +13,18 @@ def get_company_list(n=500):
     temp = pd.read_csv('../SP500.csv')
     return np.array(temp['Symbol'])[:n]
         
-
+def get_esg_list(k=100):
+    company_list=get_company_list(k)
+    
+    esg_list=np.unique(np.array(pd.read_csv('../data/esg/{}_esg.csv'.format(company_list[0]))['aspectname']))
+    
+    for i in company_list: 
+        try : 
+            temp_list = np.unique(np.array(pd.read_csv('../data/esg/{}_esg.csv'.format(i))['aspectname']))
+            esg_list = np.intersect1d(temp_list, esg_list)
+        except:
+            pass
+    return esg_list
 
 
 
