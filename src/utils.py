@@ -1,7 +1,3 @@
-import csv 
-
-# In fact, we use the pd.datetime 
-import datetime 
 import time 
 
 import pandas as pd 
@@ -35,9 +31,13 @@ class company():
     frequency = pd.Timedelta(days=1) 
     
     # We need the ticker name of the company to get started 
-    def __init__(self,ticker,autofill=True):
+    def __init__(self,ticker,autofill=True,esg_constrain=True):
         self.ticker = ticker  
+        self.autofill = autofill
+        self.esg_constrain = esg_constrain
         self.constrain_time_range()
+        if self.esg_constrain==True : 
+            self.constrain_time_range_esg()       
         self.generate_time_series()
 
     def __repr__(self):
@@ -51,8 +51,10 @@ class company():
         self.end = pd.to_datetime(end,format='%Y-%m-%d')
         self.frequency = pd.Timedelta(days=frequency)
         self.constrain_time_range()
+        if self.esg_constrain==True : 
+            self.constrain_time_range_esg()       
         self.generate_time_series()
-
+        
         
     def constrain_time_range(self):
         # The temp is to save the readout data 
@@ -69,6 +71,26 @@ class company():
         
         if self.end > price_end : 
             self.end = price_end 
+        
+        return 
+        
+    def constrain_time_range_esg(self):
+        # The temp is to save the readout data 
+        temp = pd.read_csv('../data/esg/{}_esg.csv'.format(self.ticker))
+        
+        # Filter the data within the interesting time  area. 
+        target_row = np.where(np.array(temp['aspectname'])== 'S&P Global ESG Score')[0]
+        
+        # Filter data 
+        referdate = pd.to_datetime( np.array(temp.iloc[target_row]['scoredate']) ,format='%Y-%m-%d' )        
+        esg_start = np.min(np.array(referdate)) 
+        esg_end = np.max(np.array(referdate)) 
+        
+        if self.start < esg_start : 
+            self.start = esg_start 
+        
+        if self.end > esg_end : 
+            self.end = esg_end 
         
         return 
         
@@ -89,6 +111,27 @@ class company():
     def check_data(self):
         pass 
 
+    def read_spy_data(self):
+       
+        temp = pd.read_csv('../SPY.csv')
+        
+        # Filter the data within the interesting time  area. 
+        referdate = pd.to_datetime( temp['Date'], format='%Y-%m-%d') 
+        temp_date = np.array(referdate[ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
+        temp_data = np.array(temp['Close'][ np.array( (referdate <= self.end) &  (referdate >= self.start) )])
+        
+        # reorganzie the data sequence 
+        date_arg = np.array(np.argsort(temp_date))
+        temp_date = temp_date[date_arg]
+        temp_data = temp_data[date_arg]
+        
+        # Not Every data works, and then we will rebuild the data according to the the time series 
+        # For the timebeing, we will use the uniform choice method 
+        return_args = np.array( np.arange(len(self.time_series))* len(temp_date) / len(self.time_series) ).astype(int)
+        return_data = np.array(temp_data[return_args])
+        
+        return return_data
+        
 
     def read_data(self,target_list):
         query_result = np.zeros((len(target_list), len(self.time_series) ))
@@ -274,13 +317,20 @@ class company():
         # reorganzie the data sequence 
         date_arg = np.argsort(temp_date)
         temp_date = temp_date[date_arg]
-        temp_data = temp_data[date_arg]        
+        temp_data = temp_data[date_arg]  
+        temp_data[np.isnan(temp_data)==True]=0;
         
         # Not Every data works, and then we will rebuild the data according to the the time series 
-        # For the timebeing, we will use the uniform choice method 
-        return_args = np.array( np.arange(len(self.time_series))* len(temp_date) / len(self.time_series) ).astype(int)
-        return_data = np.array(temp_data[return_args])     
-        return return_data 
+        # For the time being, we will use the uniform choice method 
+        return_args_float = np.array( np.arange(len(self.time_series))* (len(temp_date)-1) / len(self.time_series) ) 
+        floor_data= np.array(temp_data[np.floor(return_args_float).astype(int)])
+        ceil_data = np.array(temp_data[np.ceil(return_args_float).astype(int)])
+        
+        data_weight= return_args_float - np.floor(return_args_float)
+
+        mixed_data = ceil_data * (1- data_weight) + floor_data* data_weight
+
+        return mixed_data
     
     def plot_single_data(self,target):
         pass 
